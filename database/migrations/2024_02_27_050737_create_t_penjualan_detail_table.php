@@ -17,7 +17,6 @@ return new class extends Migration
             $table->unsignedBigInteger('barang_id')->index();
             $table->integer('harga');
             $table->integer('jumlah');
-            $table->dateTime('penjualan_tanggal');
             $table->timestamps();
 
              // mendefinisikan ForeignKey pada kolom level_id mengacu pada kolom level_id di tabel m_level
