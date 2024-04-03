@@ -324,7 +324,17 @@ return [
         ],
         [
             'text' => 'Manage Kategori',
-            'url' => 'admin/manage-kategori', // Sesuaikan URL dengan URL sebenarnya Anda
+            'url' => '/kategori',
+            'icon' => 'far fa-fw fa-file',
+        ],
+        [
+            'text' => 'Manage User',
+            'url' => '/user',
+            'icon' => 'far fa-fw fa-user',
+        ],
+        [
+            'text' => 'Manage Level',
+            'url' => '/level/level',
         ],
         ['header' => 'account_settings'],
         [
