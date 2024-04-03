@@ -2,68 +2,68 @@
 
 namespace App\Http\Controllers;
 
+use App\DataTables\UserDataTable;
+use App\Http\Requests\StorePostRequest;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
-use App\DataTables\UserDataTable;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-        public function index(UserDataTable $dataTable) 
-        {
-            return $dataTable->render('user.index');
-            /*$data = [
-                'kategori_kode' => 'SNK',
-                'kategori_nama' => 'Snack/Makanan Ringan',
-                'created_at' => now(),
-            ];
-            DB::table('m_kategori')->insert($data);
-            return 'Insert data baru berhasil';*/
-
-            //$row = DB::table('m_kategori')->where('kategori_kode', 'SNK') ->update(['kategori_nama' => 'Camilan']);
-            //return 'Update data berhasil. Jumlah data yang diupdate: ' . $row. 'baris';
-
-            //$row = DB::table('m_kategori')->where('kategori_kode', 'SNK') ->delete();
-            //return 'Delete data berhasil. Jumlah data yang dihapus: ' . $row. 'baris';
-
-            //$data = DB::table('m_kategori')->get();
-            //return view('kategori' , ['data' => $data]);
-        }
-
-        public function create()
-        {
-            return view('user.create');
-        }
-
-        public function store(Request $request)
-        {
-            UserModel::create([
-                'user_kode' => $request->kodeKategori,
-                'user_nama' => $request->namaKategori,
-            ]);
-            return redirect('/user');
-        }
-
-        public function edit( $id)
-        {
-            $data = UserModel::find($id);
-            return view('user.edit' , [
-                'user' => $data
-            ]);
-        }
-
-        public function update(Request $request, $id)
-        {
-            UserModel::where('user_id' , $id)->update([
-                'user_kode' => $request->kodeKategori,
-                'user_nama' => $request->namaKategori,
-            ]);
-
-            return redirect('/user');
-        }
-
-        public function delete($id)
-        {
-        UserModel::where('user_id', $id)->delete();
-        return redirect('/user');
-        }
+    public function index(UserDataTable $dataTable)
+    {
+        return $dataTable->render('user.index');
     }
+
+    public function create()
+    {
+        return view('user.create');
+    }
+
+    public function store(StorePostRequest $request)
+{
+    // Validasi data yang masuk
+    $validatedData = $request->validate([
+        'username' => 'required',
+        'nama' => 'required',
+        'password' => 'required',
+        'level_id' => 'required',
+    ]);
+
+    // Hash password sebelum disimpan
+    $validatedData['password'] = Hash::make($validatedData['password']);
+
+    // Simpan data pengguna ke dalam database
+    UserModel::create($validatedData);
+
+    // Redirect ke halaman indeks pengguna
+    return redirect('/user');
+}
+
+
+    public function edit($id)
+    {
+        $user = UserModel::find($id);
+        return view('user.edit', ['data' => $user]);
+    }
+
+    public function update($id, Request $request)
+    {
+        $user = UserModel::find($id);
+
+        $user->username = $request->username;
+        $user->nama = $request->nama;
+        $user->level_id = $request->level_id;
+
+        $user->save();
+        return redirect('/user');
+    }
+
+    public function delete($id)
+    {
+        $user = UserModel::find($id);
+        $user->delete();
+
+        return redirect('/user');
+    }
+}

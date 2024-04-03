@@ -2,71 +2,68 @@
 
 namespace App\Http\Controllers;
 
+use App\DataTables\KategoriDataTable;
+use App\Http\Requests\StorePostRequest;
+use App\Models\KategoriModel;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\DataTables\KategoriDataTable;
-use App\Models\KategoriModel;
-use PhpParser\Builder\Function_;
-use PhpParser\Node\Expr\FuncCall;
+use Illuminate\View\View;
 
 class KategoriController extends Controller
 {
-    public function index(KategoriDataTable $dataTable) 
+    public function index(KategoriDataTable $dataTable)
     {
         return $dataTable->render('kategori.index');
-        /*$data = [
-            'kategori_kode' => 'SNK',
-            'kategori_nama' => 'Snack/Makanan Ringan',
-            'created_at' => now(),
-        ];
-        DB::table('m_kategori')->insert($data);
-        return 'Insert data baru berhasil';*/
-
-        //$row = DB::table('m_kategori')->where('kategori_kode', 'SNK') ->update(['kategori_nama' => 'Camilan']);
-        //return 'Update data berhasil. Jumlah data yang diupdate: ' . $row. 'baris';
-
-        //$row = DB::table('m_kategori')->where('kategori_kode', 'SNK') ->delete();
-        //return 'Delete data berhasil. Jumlah data yang dihapus: ' . $row. 'baris';
-
-        //$data = DB::table('m_kategori')->get();
-        //return view('kategori' , ['data' => $data]);
     }
 
-    public function create()
+    public function create(): View
     {
         return view('kategori.create');
     }
 
-    public function store(Request $request)
+    public function store(StorePostRequest $request): RedirectResponse
     {
+        // The incoming request is valid...
+
+        // Retrieve the validated input data...
+        $validated = $request->validate();
+
+        // Retrieve a portion of the validated input data...
+        $validated = $request->safe()->only(['kategori_kode', 'kategori_nama']);
+        $validated = $request->safe()->except(['kategori_kode', 'kategori_nama']);
+
         KategoriModel::create([
             'kategori_kode' => $request->kodeKategori,
-            'kategori_nama' => $request->namaKategori,
+            'kategori_nama' => $request->namaKategori
         ]);
+
+        // Store the post...
+
         return redirect('/kategori');
     }
 
-    public function edit( $id)
+    public function edit($id)
     {
-        $data = KategoriModel::find($id);
-        return view('kategori.edit' , [
-            'kategori' => $data
-        ]);
+        $kategori = KategoriModel::find($id);
+        return view('kategori.edit', ['data' => $kategori]);
     }
 
-    public function update(Request $request, $id)
+    public function update($id, Request $request)
     {
-        KategoriModel::where('kategori_id' , $id)->update([
-            'kategori_kode' => $request->kodeKategori,
-            'kategori_nama' => $request->namaKategori,
-        ]);
+        $kategori = KategoriModel::find($id);
+
+        $kategori->kategori_kode = $request->kodeKategori;
+        $kategori->kategori_nama = $request->namaKategori;
+
+        $kategori->save();
 
         return redirect('/kategori');
     }
 
     public function delete($id)
     {
-       KategoriModel::where('kategori_id', $id)->delete();
-       return redirect('/kategori');
+        KategoriModel::find($id)->delete();
+        return redirect('/kategori');
     }
 }
