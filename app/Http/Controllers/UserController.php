@@ -21,24 +21,27 @@ class UserController extends Controller
     }
 
     public function store(StorePostRequest $request)
-{
-    // Validasi data yang masuk
-    $validatedData = $request->validate([
-        'username' => 'required',
-        'nama' => 'required',
-        'password' => 'required',
-        'level_id' => 'required',
-    ]);
+    {
+        // The incoming request is valid...
 
-    // Hash password sebelum disimpan
-    $validatedData['password'] = Hash::make($validatedData['password']);
+        // Retrieve the validated input data...
+        $validated = $request->validate();
 
-    // Simpan data pengguna ke dalam database
-    UserModel::create($validatedData);
+        // Retrieve a portion of the validated input data...
+        $validated = $request->safe()->only(['username', 'nama', 'password', 'level_id']);
+        $validated = $request->safe()->except(['username', 'nama', 'password', 'level_id']);
 
-    // Redirect ke halaman indeks pengguna
-    return redirect('/user');
-}
+        UserModel::create([
+            'username' => $request->username,
+            'nama' => $request->nama,
+            'password' => Hash::make('$request->password'),
+            'level_id' => $request->level_id
+        ]);
+
+        // Store the post...
+
+        return redirect('/user');
+    }
 
 
     public function edit($id)
