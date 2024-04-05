@@ -16,4 +16,9 @@ class LevelModel extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    protected $fillable = [
+        'level_nama',
+        'level_kode'
+    ];
 }

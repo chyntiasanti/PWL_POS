@@ -34,30 +34,32 @@ class UserController extends Controller
     }*/
 
 
-// Ambil data user dalam bentuk json untuk datatables
-public function list(Request $request)
-{
-    $users = UserModel::select('user_id', 'username', 'nama', 'level_id')
-                ->with('level');
-                //->get();
-
-    //Filter data user berdasarkan level_id
-    if($request->level_id){
-        $users->where('level_id', $request->level_id);
+    public function list(Request $request)
+    {
+        $users = UserModel::select('user_id', 'username', 'nama', 'level_id')
+                    ->with('level');
+    
+        // Filter data user berdasarkan level_id
+        if($request->level_id){
+            $users->where('level_id', $request->level_id);
+        }
+    
+        $users = $users->get();
+    
+        return DataTables::of($users)
+                ->addIndexColumn() // menambahkan kolom index / no urut (default nama kolom: DT_RowIndex)
+                ->addColumn('aksi', function ($user) { // menambahkan kolom aksi
+                    $btn = '<a href="'.url('/user/' . $user->user_id).'" class="btn btn-info btn-sm">Detail</a> ';
+                    $btn .= '<a href="'.url('/user/' . $user->user_id . '/edit').'" class="btn btn-warning btn-sm">Edit</a> ';
+                    $btn .= '<form class="d-inline-block" method="POST" action="'.url('/user/'.$user->user_id).'">' .
+                            csrf_field() . method_field('DELETE') .
+                            '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>';
+                    return $btn;
+                })
+                ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
+                ->make(true);
     }
-    return DataTables::of($users)
-            ->addIndexColumn() // menambahkan kolom index / no urut (default nama kolom: DT_RowIndex)
-            ->addColumn('aksi', function ($user) { // menambahkan kolom aksi
-                $btn = '<a href="'.url('/user/' . $user->user_id).'" class="btn btn-info btn-sm">Detail</a> ';
-                $btn .= '<a href="'.url('/user/' . $user->user_id . '/edit').'" class="btn btn-warning btn-sm">Edit</a> ';
-                $btn .= '<form class="d-inline-block" method="POST" action="'.url('/user/'.$user->user_id).'">' .
-                        csrf_field() . method_field('DELETE') .
-                        '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>';
-                return $btn;
-            })
-            ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
-            ->make(true);
-}
+    
 
 //Menampilkan halaman form tambah user
 public function create()
@@ -138,25 +140,27 @@ public function edit(string $id)
     return view('user.edit', ['breadcrumb' => $breadcrumb, 'page' => $page, 'user' => $user, 'level' => $level, 'activeMenu' => $activeMenu]);
 }
 
-//Menyimpan perubahan data user
+// Menyimpan perubahan data level
 public function update(Request $request, string $id)
 {
     $request->validate([
-        'username' => 'required|string|min:3|unique:m_user,username,'.$id.',user_id',
-        'nama' => 'required|string|max:100',
-        'password' => 'nullable|min:5',
-        'level_id' => 'required|integer'
+        'level_kode' => 'required|string|max:100',
+        'level_nama' => 'required|string|max:10'
     ]);
 
-    $user = UserModel::find($id);
-    $user->update([
-        'username' => $request->username,
-        'nama' => $request->nama,
-        'password' => $request->filled('password') ? bcrypt($request->password) : $user->password,
-        'level_id' => $request->level_id
+    $level = LevelModel::find($id);
+
+    // Jika level tidak ditemukan, kembalikan pesan kesalahan
+    if (!$level) {
+        return redirect('/level')->with('error', 'Level tidak ditemukan');
+    }
+
+    $level->update([
+        'level_kode' => $request->level_kode,
+        'level_nama' => $request->level_nama
     ]);
 
-    return redirect('/user')->with('success', 'Data user berhasil diubah');
+    return redirect('/level')->with('success', 'Data level berhasil diubah');
 }
 
 //Menghapus data user
