@@ -16,23 +16,6 @@ use function Laravel\Prompts\password;
 
 class UserController extends Controller
 {
-    //Menampilkan halaman awal user
-    /*public function index()
-    {
-        $breadcrumb = (object) [
-            'title' => 'Daftar User',
-            'list' => ['Home', 'User']
-        ];
-
-        $page = (object) [
-            'title' => "Daftar user yang terdaftar pada sistem"
-        ];
-
-        $activeMenu = 'user'; //set menu yang sedang aktif
-
-        return view('user.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'achiveMenu' => $activeMenu]);
-    }*/
-
 
     public function list(Request $request)
     {

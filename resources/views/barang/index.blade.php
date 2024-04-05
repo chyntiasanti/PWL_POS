@@ -1,11 +1,10 @@
 @extends('layouts.template')
 @section('content')
-@section('content')
     <div class="card card-outline card-primary">
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools">
-                <a class="btn btn-sm btn-primary mt-1" href="{{ url('kategori/create') }}">Tambah</a>
+                <a class="btn btn-sm btn-primary mt-1" href="{{ url('barang/create') }}">Tambah</a>
             </div>
         </div>
         <div class="card-body">
@@ -20,10 +19,10 @@
                     <div class="form-group row">
                         <label class="col-1 control-label col-form-label">Filter:</label>
                         <div class="col-3">
-                            <select name="kategori_kode" id="kategori_kode" class="form-control" required>
+                            <select name="kategori_id" id="kategori_id" class="form-control" required>
                                 <option value="">- Semua -</option>
                                 @foreach ($kategori as $item)
-                                    <option value="{{ $item->kategori_kode }}">{{ $item->kategori_kode }}</option>
+                                    <option value="{{ $item->kategori_id}}">{{ $item->kategori_nama }}</option>
                                 @endforeach
                             </select>
                             <small class="form-text text-muted">Kode</small>
@@ -31,10 +30,16 @@
                     </div>
                 </div>
             </div>            
-            <table class="table-bordered table-striped table-hover table-sm table" id="table_kategori">
+            <table class="table-bordered table-striped table-hover table-sm table" id="table_barang">
                 <thead>
                     <tr>
-                        <th>ID</th><th>Kode</th><th>Nama</th><th>Aksi</th>
+                        <th>ID Barang</th>
+                        <th>ID Kategori</th>
+                        <th>Kode</th>
+                        <th>Nama</th>
+                        <th>Harga Beli</th>
+                        <th>Harga Jual</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
             </table>
@@ -42,23 +47,26 @@
     </div>
 @endsection
 
-@endsection
-@push('css')
-@endpush
 @push('js')
 <script>
 $(document).ready(function() {
-    var dataLevel = $('#table_kategori').DataTable({
+    var dataTable = $('#table_barang').DataTable({
         serverSide: true,
         ajax: {
-            "url": "{{ url('kategori/list') }}",
+            "url": "{{ url('barang/list') }}",
             "dataType": "json",
             "type": "POST",
             "data": function (d) {
-                d.level_id = $('#kategori_id').val();
+                d.barang_id = $('#nama_barang').val(); // Memperbaiki nama variabel
             }
         },
         columns: [
+            {
+                data: "barang_id",
+                className: "",
+                orderable: true,
+                searchable: true
+            },
             {
                 data: "kategori_id",
                 className: "",
@@ -66,13 +74,25 @@ $(document).ready(function() {
                 searchable: true
             },
             {
-                data: "kategori_kode",
+                data: "barang_kode",
                 className: "",
                 orderable: true,
                 searchable: true
             },
             {
-                data: "kategori_nama",
+                data: "barang_nama",
+                className: "",
+                orderable: true,
+                searchable: true
+            },
+            {
+                data: "harga_beli",
+                className: "",
+                orderable: true,
+                searchable: true
+            },
+            {
+                data: "harga_jual",
                 className: "",
                 orderable: true,
                 searchable: true
@@ -80,14 +100,14 @@ $(document).ready(function() {
             {
                 data: "aksi",
                 className: "",
-                orderable: false, // orderable: true, jika ingin kolom ini bisa diurutkan
-                searchable: false // searchable: true, jika ingin kolom ini bisa dicari
+                orderable: false,
+                searchable: false
             }
         ]
     });
 
-    $('#kategori_id').on('change', function() {
-        dataKategori.ajax.reload();
+    $('#nama_barang').on('change', function() {
+        dataTable.ajax.reload(); // Memperbaiki nama variabel
     });
 
 });
