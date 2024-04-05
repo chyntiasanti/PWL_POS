@@ -17,7 +17,7 @@ use function Laravel\Prompts\password;
 class UserController extends Controller
 {
     //Menampilkan halaman awal user
-    public function index()
+    /*public function index()
     {
         $breadcrumb = (object) [
             'title' => 'Daftar User',
@@ -31,16 +31,20 @@ class UserController extends Controller
         $activeMenu = 'user'; //set menu yang sedang aktif
 
         return view('user.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'achiveMenu' => $activeMenu]);
-    }
+    }*/
 
-    // Ambil data user dalam bentuk json untuk datatables
+
 // Ambil data user dalam bentuk json untuk datatables
 public function list(Request $request)
 {
     $users = UserModel::select('user_id', 'username', 'nama', 'level_id')
-                ->with('level')
-                ->get();
+                ->with('level');
+                //->get();
 
+    //Filter data user berdasarkan level_id
+    if($request->level_id){
+        $users->where('level_id', $request->level_id);
+    }
     return DataTables::of($users)
             ->addIndexColumn() // menambahkan kolom index / no urut (default nama kolom: DT_RowIndex)
             ->addColumn('aksi', function ($user) { // menambahkan kolom aksi
@@ -171,6 +175,26 @@ public function destroy(string $id)
         return redirect('/user')->with('error', 'Data user tidak dapat dihapus karena masih terdapat label lain yang terkait dengan data ini');
     }    
 }
+
+//Menampilkan halaman awal user
+public function index()
+{
+    $breadcrumb = (object) [
+        'title' => 'Daftar User',
+        'list' => ['Home', 'User']
+    ];
+
+    $page = (object) [
+        'title' => 'Daftar user yang terdaftar dalam sistem'
+    ];
+
+    $activeMenu = 'user';
+
+    $level = LevelModel::all();
+
+    return view('user.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'level' => $level, 'activeMenu' => $activeMenu]);
+}
+
 
 
     /*public function index(UserDataTable $dataTable)
