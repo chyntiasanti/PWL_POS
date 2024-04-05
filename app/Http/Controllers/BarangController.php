@@ -147,16 +147,16 @@ class BarangController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'kode' => 'required|string|min:3',
-            'nama' => 'required|string|max:100',
+            'barang_kode' => 'required|string|min:3',
+            'barang_nama' => 'required|string|max:100',
             'kategori_id' => 'required|integer',
             'harga_beli' => 'required|integer',
             'harga_jual' => 'required|integer'
         ]);
 
         BarangModel::find($id)->update([
-            'barang_kode' => $request->kode,
-            'barang_nama' => $request->nama,
+            'barang_kode' => $request->barang_kode,
+            'barang_nama' => $request->barang_nama,
             'kategori_id' => $request->kategori_id,
             'harga_beli' => $request->harga_beli,
             'harga_jual' => $request->harga_jual,
