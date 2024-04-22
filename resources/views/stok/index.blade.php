@@ -19,17 +19,18 @@
                 <div class="form-group row">
                     <label class="col-1 control-label col-form-label">Filter:</label>
                     <div class="col-3">
-                        <select name="user_id" id="user_id" class="form-control" required>
+                        <select name="barang_id" id="barang_id" class="form-control" required>
                             <option value="">- Semua -</option>
-                            @foreach ($user as $item)
-                                <option value="{{ $item->user_id}}">{{ $item->username}}</option>
+                            @foreach ($barang as $item)
+                                <option value="{{ $item->barang_id }}">{{ $item->barang_nama }}</option>
                             @endforeach
                         </select>
-                        <small class="form-text text-muted">Username</small>
+                        <small class="form-text text-muted">Nama Barang</small>
                     </div>
                 </div>
             </div>
         </div>
+        
         <table class="table table-bordered table-striped table-hover table-sm" id="table_stok">
             <thead>
                 <tr><th>ID</th><th>ID Barang</th><th>ID User</th><th>Tanggal</th><th>Jumlah</th><th>Aksi</th></tr>
@@ -94,8 +95,8 @@ $(document).ready(function() {
             }
         ]
     });
-
-    $('#user_id').on('change', function() {
+    
+    $('#barang_id').on('change', function() {
         dataStok.ajax.reload();
     });
 

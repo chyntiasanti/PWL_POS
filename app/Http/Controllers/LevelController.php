@@ -23,14 +23,13 @@ class LevelController extends Controller
         ];
 
         $page = (object) [
-            'title' => 'Daftar Level yang terdaftar dalam sistem'
+            'title' => 'Daftar level yang terdaftar dalam sistem'
         ];
 
-        $activeMenu = 'level';
-
+        $activeMenu = 'level'; // set menu yang sedang aktif
         $level = LevelModel::all();
 
-        return view('level.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'level' => $level, 'activeMenu' => $activeMenu]);
+        return view('level.index', ['breadcrumb' => $breadcrumb, 'page' => $page,'level'=> $level, 'activeMenu' => $activeMenu]);
     }
 
     //Menampilkan halaman form tambah level

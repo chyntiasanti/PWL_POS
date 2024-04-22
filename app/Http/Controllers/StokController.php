@@ -24,32 +24,34 @@ class StokController extends Controller
             'title' => 'Daftar Stok yang terdaftar dalam sistem'
         ];
 
-        $user = UserModel::all();
+        $barang = BarangModel::all();
 
         $activeMenu = 'stok';
 
-        return view('stok.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'user' => $user, 'activeMenu' => $activeMenu]);
+        return view('stok.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'barang' => $barang, 'activeMenu' => $activeMenu]);
     }
 
     public function list(Request $request)
-    {
-        $stok = StokModel::select('stok_id', 'barang_id', 'user_id', 'stok_tanggal', 'stok_jumlah')
-            ->with(['barang', 'user']);
+{
+    $stok = StokModel::select('stok_id', 'barang_id', 'user_id', 'stok_tanggal', 'stok_jumlah')
+        ->with(['barang', 'user']);
 
-        if ($request->user_id) {
-            $stok->where('user_id', $request->user_id);
-        }
-
-        return DataTables::of($stok)
-            ->addIndexColumn()
-            ->addColumn('aksi', function ($stok) {
-                $btn = '<a href="' . url('/stok/' . $stok->stok_id) . '" class="btn btn-info btn-sm">Detail</a> ';
-                $btn .= '<a href="' . url('/stok/' . $stok->stok_id . '/edit') . '" class="btn btn-warning btn-sm">Edit</a> ';
-                return $btn;
-            })
-            ->rawColumns(['aksi'])
-            ->make(true);
+    // Menerapkan filter jika barang_id diberikan dalam permintaan
+    if ($request->has('barang_id')) {
+        $stok->where('barang_id', $request->barang_id);
     }
+
+    return DataTables::of($stok)
+        ->addIndexColumn()
+        ->addColumn('aksi', function ($stok) {
+            $btn = '<a href="' . url('/stok/' . $stok->stok_id) . '" class="btn btn-info btn-sm">Detail</a> ';
+            $btn .= '<a href="' . url('/stok/' . $stok->stok_id . '/edit') . '" class="btn btn-warning btn-sm">Edit</a> ';
+            return $btn;
+        })
+        ->rawColumns(['aksi'])
+        ->make(true);
+}
+
 
     /**
      * Display the specified resource.

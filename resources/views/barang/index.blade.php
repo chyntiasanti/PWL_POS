@@ -1,4 +1,6 @@
+
 @extends('layouts.template')
+
 @section('content')
     <div class="card card-outline card-primary">
         <div class="card-header">
@@ -19,97 +21,79 @@
                     <div class="form-group row">
                         <label class="col-1 control-label col-form-label">Filter:</label>
                         <div class="col-3">
-                            <select name="kategori_id" id="kategori_id" class="form-control" required>
+                            <select class="form-control" id="kategori_id" name="kategori_id" required>
                                 <option value="">- Semua -</option>
                                 @foreach ($kategori as $item)
-                                    <option value="{{ $item->kategori_id}}">{{ $item->kategori_nama }}</option>
+                                    <option value="{{ $item->kategori_id }}">{{ $item->kategori_nama }}</option>
                                 @endforeach
                             </select>
-                            <small class="form-text text-muted">Kode</small>
+                            <small class="form-text text-muted">Kategori Barang</small>
                         </div>
                     </div>
                 </div>
-            </div>            
-            <table class="table-bordered table-striped table-hover table-sm table" id="table_barang">
+            </div>
+            <table class="table table-bordered table-striped table-hover table-sm" id="table_barang">
                 <thead>
-                    <tr>
-                        <th>ID Barang</th>
-                        <th>ID Kategori</th>
-                        <th>Kode</th>
-                        <th>Nama</th>
-                        <th>Harga Beli</th>
-                        <th>Harga Jual</th>
-                        <th>Aksi</th>
-                    </tr>
+                    <tr><th>No</th><th>ID Barang</th><th>Kategori</th><th>Kode Barang</th><th>Nama Barang</th><th>Aksi</th></tr>
                 </thead>
             </table>
         </div>
     </div>
 @endsection
 
+@push('css')
+@endpush
+
 @push('js')
-<script>
-$(document).ready(function() {
-    var dataTable = $('#table_barang').DataTable({
-        serverSide: true,
-        ajax: {
-            "url": "{{ url('barang/list') }}",
-            "dataType": "json",
-            "type": "POST",
-            "data": function (d) {
-                d.barang_id = $('#nama_barang').val(); // Memperbaiki nama variabel
-            }
-        },
-        columns: [
-            {
-                data: "barang_id",
-                className: "",
-                orderable: true,
-                searchable: true
-            },
-            {
-                data: "kategori_id",
-                className: "",
-                orderable: true,
-                searchable: true
-            },
-            {
-                data: "barang_kode",
-                className: "",
-                orderable: true,
-                searchable: true
-            },
-            {
-                data: "barang_nama",
-                className: "",
-                orderable: true,
-                searchable: true
-            },
-            {
-                data: "harga_beli",
-                className: "",
-                orderable: true,
-                searchable: true
-            },
-            {
-                data: "harga_jual",
-                className: "",
-                orderable: true,
-                searchable: true
-            },
-            {
-                data: "aksi",
-                className: "",
-                orderable: false,
-                searchable: false
-            }
-        ]
-    });
+    <script>
+        $(document).ready(function() {
+            var dataBarang = $('#table_barang').DataTable({
+                serverSide: true, 
+                ajax: {
+                    "url": "{{ url('barang/list') }}",
+                    "dataType": "json",
+                    "type": "POST",
+                    "data": function (d) {
+                        d.kategori_id = $('#kategori_id').val();
+                    }
+                },
+                columns: [{
+                    data: "DT_RowIndex",
+                    className: "text-center",
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: "barang_id",
+                    className: "",
+                    orderable: true,
+                    searchable: true
+                }, {
+                    data: "kategori.kategori_nama",
+                    className: "",
+                    orderable: true,
+                    searchable: true
+                }, {
+                    data: "barang_kode",
+                    className: "",
+                    orderable: true,
+                    searchable: true
+                }, {
+                    data: "barang_nama",
+                    className: "",
+                    orderable: true,
+                    searchable: true
+                }, {
+                    data: "aksi",
+                    className: "",
+                    orderable: false,
+                    searchable: false
+                }]
+            });
 
-    $('#nama_barang').on('change', function() {
-        dataTable.ajax.reload(); // Memperbaiki nama variabel
-    });
+            S('#kategori_id').on('change', function() {
+                dataBarang.ajax.reload();
+            }) ;
 
-});
-</script>
+        });
+    </script>
 @endpush

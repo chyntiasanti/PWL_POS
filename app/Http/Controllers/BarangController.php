@@ -20,12 +20,12 @@ class BarangController extends Controller
         ];
 
         $page = (object) [
-            'title' => 'Daftar Barang yang terdaftar dalam sistem'
+            'title' => 'Daftar barang yang terdaftar dalam sistem'
         ];
 
-        $activeMenu = 'barang';
+        $activeMenu = 'barang'; // set menu yang sedang aktif
 
-        $kategori = KategoriModel::all();
+        $kategori = KategoriModel::all(); //ambil data level untuk filter level
 
         return view('barang.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'kategori' => $kategori, 'activeMenu' => $activeMenu]);
     }
