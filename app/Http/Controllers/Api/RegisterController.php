@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\UserModel;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\UserModel;
 use App\Models\UserModel as ModelsUserModel;
 use Illuminate\Http\Request;
 USE Illuminate\Support\Facades\Validator;
+
 
 class RegisterController extends Controller
 {
@@ -17,7 +18,8 @@ class RegisterController extends Controller
             'username' => 'required',
             'nama' => 'required',
             'password'=> 'required|min:5|confirmed',
-            'level_id' => 'required'
+            'level_id' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
         
         //if validations fails
@@ -25,12 +27,16 @@ class RegisterController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+        //Get the Image File
+        $image = $request->file('image');
+
         //create user
-        $user = ModelsUserModel::create([
+        $user = UserModel::create([
             'username' => $request->username,
             'nama' => $request->nama,
             'password' => bcrypt($request->password),
             'level_id'=> $request->level_id,
+            'image' => $image->hashName()
         ]);
 
         //return response JSON user is created

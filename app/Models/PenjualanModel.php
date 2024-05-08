@@ -1,25 +1,37 @@
 <?php
-
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Foundation\Auth\Penjualan as  Authenticatable;
+
 
 class PenjualanModel extends Model
 {
+
+    public function getJWTIdentifier(){
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims(){
+        return [];
+    }
+
     protected $table = 't_penjualan';
     protected $primaryKey = 'penjualan_id';
 
-    protected $fillable = ['penjualan_id', 'user_id', 'pembeli', 'penjualan_kode', 'penjualan_tanggal'];
+    protected $fillable = ['user_id', 'pembeli', 'penjualan_kode', 'penjualan_tanggal','created_at', 'update_at', 'image'];
 
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
+
+    public function user(){
+        return $this->hasMany(UserModel::class, 'user_id', 'iser_id');
     }
 
-    public function detail(): HasMany {
-        return $this->hasMany(PenjualanDetailModel::class, 'detail_id', 'penjualan_id');
+    protected function image(): Attribute {
+        return new Attribute(
+            get: fn ($image) => url('/storage/posts/' . $image),
+        );
     }
 }
