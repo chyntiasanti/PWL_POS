@@ -20,27 +20,26 @@ class BarangController extends Controller
         ];
 
         $page = (object) [
-            'title' => 'Daftar barang yang terdaftar dalam sistem'
+            'title' => 'Daftar Barang yang terdaftar dalam sistem'
         ];
 
-        $activeMenu = 'barang'; // set menu yang sedang aktif
+        $kategori = KategoriModel::all();
 
-        $kategori = KategoriModel::all(); //ambil data level untuk filter level
+        $activeMenu = 'barang';
 
         return view('barang.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'kategori' => $kategori, 'activeMenu' => $activeMenu]);
     }
 
     public function list(Request $request)
     {
-        $barangs = BarangModel::select('barang_id', 'barang_kode', 'barang_nama', 'kategori_id', 'harga_beli', 'harga_jual')
+        $barang = BarangModel::select('barang_id', 'barang_kode', 'barang_nama', 'kategori_id', 'harga_beli', 'harga_jual')
             ->with('kategori');
 
         if ($request->kategori_id) {
-            $barangs->where('kategori_id', $request->kategori_id);
+            $barang->where('kategori_id', $request->kategori_id);
         }
-        $barangs = $barangs->get();
 
-        return DataTables::of($barangs)
+        return DataTables::of($barang)
             ->addIndexColumn()
             ->addColumn('aksi', function ($barang) {
                 $btn = '<a href="' . url('/barang/' . $barang->barang_id) . '" class="btn btn-info btn-sm">Detail</a> ';
@@ -82,17 +81,27 @@ class BarangController extends Controller
         $request->validate([
             'barang_kode' => 'required|string|min:3|unique:m_barang,barang_kode',
             'barang_nama' => 'required|string|max:100',
+            'kategori_id' => 'required|integer',
             'harga_beli' => 'required|integer',
             'harga_jual' => 'required|integer',
-            'kategori_id' => 'required|integer',
+            'berkas' => 'required'
         ]);
+
+        // Get file extension
+        $extFile = $request->berkas->extension();
+        $nama = $request->barang_kode . " - " . $request->barang_nama . ".$extFile";
+        // Pindahkan gambar ke folder
+        $path = $request->berkas->move('gambar', $nama);
+        $path = str_replace("\\", "//", $path);
+        $pathBaru = asset('gambar/' . $nama);
 
         BarangModel::create([
             'barang_kode' => $request->barang_kode,
             'barang_nama' => $request->barang_nama,
+            'kategori_id' => $request->kategori_id,
             'harga_beli' => $request->harga_beli,
             'harga_jual' => $request->harga_jual,
-            'kategori_id' => $request->kategori_id,
+            'image' => $pathBaru,
         ]);
 
         return redirect('/barang')->with('success', 'Data barang berhasil disimpan');
@@ -106,7 +115,7 @@ class BarangController extends Controller
         $barang = BarangModel::with('kategori')->find($id);
 
         $breadcrumb = (object) [
-            'title' => 'Detail Barang',
+            'title' => 'Daftar Barang',
             'list' => ['Home', 'Barang', 'Detail']
         ];
 
@@ -147,16 +156,16 @@ class BarangController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'barang_kode' => 'required|string|min:3',
-            'barang_nama' => 'required|string|max:100',
+            'kode' => 'required|string|min:3',
+            'nama' => 'required|string|max:100',
             'kategori_id' => 'required|integer',
             'harga_beli' => 'required|integer',
             'harga_jual' => 'required|integer'
         ]);
 
         BarangModel::find($id)->update([
-            'barang_kode' => $request->barang_kode,
-            'barang_nama' => $request->barang_nama,
+            'barang_kode' => $request->kode,
+            'barang_nama' => $request->nama,
             'kategori_id' => $request->kategori_id,
             'harga_beli' => $request->harga_beli,
             'harga_jual' => $request->harga_jual,
@@ -164,7 +173,6 @@ class BarangController extends Controller
 
         return redirect('/barang')->with('success', 'Data barang berhasil diubah');
     }
-    
 
     /**
      * Remove the specified resource from storage.

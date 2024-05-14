@@ -21,4 +21,5 @@ class LevelModel extends Model
         'level_nama',
         'level_kode'
     ];
+
 }

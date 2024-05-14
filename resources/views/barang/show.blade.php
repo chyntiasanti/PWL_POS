@@ -34,6 +34,10 @@
                     <th>Harga Jual</th>
                     <td>{{ $barang->harga_jual }}</td>
                 </tr>
+                <tr>
+                    <th>Gambar</th>
+                    <td><img src="{{ $barang->image }}" alt=""></td>
+                </tr>
             </table>
         @endempty
         <a href="{{ url('user') }}" class="btn btn-sm btn-default mt-2">Kembali</a>
